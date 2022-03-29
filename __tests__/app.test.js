@@ -12,35 +12,31 @@ beforeEach(() => {
   return seed(testdata);
 });
 
-xdescribe("GET /api/topics", () => {
+describe("GET /api/topics", () => {
   test("GET respond with an array of topics", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
       .then((res) => {
-        // console.log(res.body);
         expect(res.body.topics.length).toBe(3);
       });
   });
 });
 
-xdescribe("GET /api/articles/:article_id", () => {
-  test("GET respond with an array of articles based on id", () => {
-    return request(app)
-      .get("/api/articles/5")
-      .expect(200)
-      .then((res) => {
-        // console.log(res.body.articles);
-        expect(res.body.article).toEqual({
-          article_id: expect.any(Number),
-          title: expect.any(String),
-          topic: expect.any(String),
-          author: expect.any(String),
-          body: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-        });
-      });
+describe("GET /api/articles/:article_id (comment count)", () => {
+  test("GET respond with an array of articles based on id", async () => {
+    const res = await request(app).get("/api/articles/2").expect(200);
+
+    expect(res.body.article).toEqual({
+      article_id: expect.any(Number),
+      title: expect.any(String),
+      topic: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      comment_count: expect.any(Number),
+    });
   });
   test("responds with 404 not found when id does not exist", () => {
     return request(app)
@@ -53,7 +49,7 @@ xdescribe("GET /api/articles/:article_id", () => {
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-  xtest("responds with the updated article", async () => {
+  test("responds with the updated article", async () => {
     const res = await request(app)
       .patch("/api/articles/2")
       .send({ inc_votes: 5 })
@@ -80,7 +76,7 @@ describe("PATCH /api/articles/:article_id", () => {
 describe("GET /api/users", () => {
   test("GET respond with an array of users", async () => {
     const res = await request(app).get("/api/users").expect(200);
-    // console.log(res.body.user);
+
     res.body.user.forEach(() => {
       expect.objectContaining({
         username: expect.any(String),
@@ -89,5 +85,24 @@ describe("GET /api/users", () => {
       });
     });
     expect(res.body.user.length).toBe(4);
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("GET respond with an array of articles with the comment_count", async () => {
+    const res = await request(app).get("/api/articles").expect(200);
+
+    res.body.article.forEach(() => {
+      expect.objectContaining({
+        article_id: expect.any(Number),
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        comment_count: expect.any(Number),
+      });
+    });
   });
 });

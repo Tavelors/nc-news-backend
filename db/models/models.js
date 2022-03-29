@@ -6,23 +6,29 @@ exports.locateTopics = (stuff) => {
   });
 };
 
-exports.locateArticleId = (article_Id) => {
-  if (article_Id > 500) {
+exports.locateArticleId = async (article_Id) => {
+  const queryArticles = db.query(
+    `SELECT * FROM articles WHERE article_id = ${article_Id};`
+  );
+  const result = await queryArticles;
+
+  if (result.rows.length === 0) {
     return Promise.reject({ status: 404, msg: "not found" });
   }
 
-  console.log(article_Id, "fail test");
-  let querys = `SELECT * FROM articles WHERE article_id = ${article_Id};`;
-  console.log(querys);
-  return db.query(querys).then((results) => {
-    return results.rows[0];
-  });
+  const queryComments = db.query(
+    `select * from comments where author = '${result.rows[0].author}';`
+  );
+  const newResult = await queryComments;
+
+  result.rows[0]["comment_count"] = newResult.rows.length;
+
+  return result.rows[0];
 };
 
 exports.updateArticleId = async (article_id, newVote) => {
-  //   console.log(newVote, "vote");
   const query = `UPDATE articles SET votes = votes + ${newVote} WHERE article_id = ${article_id} RETURNING *;`;
-  //   console.log(query);
+
   const result = await db.query(query);
   if (result.rows.length === 0) {
     return Promise.reject({ msg: "not found", status: 404 });
@@ -34,4 +40,18 @@ exports.locateUsers = async () => {
   const query = `SELECT * FROM users`;
   const result = await db.query(query);
   return result.rows;
+};
+
+exports.locateArticles = async () => {
+  const query = db.query(`SELECT * FROM articles`);
+  const result = await query;
+  const queryComments = db.query(
+    `select * from comments where author = '${result.rows[0].author}';`
+  );
+  const newResult = await queryComments;
+  newResult.rows.forEach((rows) => {
+    rows["comment_count"] = newResult.rows.length;
+  });
+
+  return newResult.rows;
 };

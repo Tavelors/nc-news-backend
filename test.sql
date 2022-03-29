@@ -1,3 +1,8 @@
 \c nc_news_test;
 
-select * from articles WHERE article_id = 2;
+-- select * from articles;
+-- select * from comments;
+
+select * 
+from comments
+where author = 'icellusedkars';

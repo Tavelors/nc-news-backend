@@ -3,6 +3,7 @@ const {
   locateArticleId,
   updateArticleId,
   locateUsers,
+  locateArticles,
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -17,7 +18,6 @@ exports.getArticleId = (req, res, next) => {
   const { article_id } = req.params;
   locateArticleId(article_id)
     .then((article) => {
-      console.log(article, " article---");
       res.status(200).send({ article: article });
     })
     .catch(next);
@@ -25,7 +25,6 @@ exports.getArticleId = (req, res, next) => {
 
 exports.patchArticleId = async (req, res, next) => {
   try {
-    // console.log(req.body);
     const { article_id } = req.params;
     const { inc_votes } = req.body;
     const patchArticle = await updateArticleId(article_id, inc_votes);
@@ -35,10 +34,19 @@ exports.patchArticleId = async (req, res, next) => {
   }
 };
 
-exports.getUsers = async (req, res) => {
+exports.getUsers = async (req, res, next) => {
   try {
     const users = await locateUsers();
     res.status(200).send({ user: users });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getArticles = async (req, res, next) => {
+  try {
+    const articles = await locateArticles();
+    res.status(200).send({ article: articles });
   } catch (err) {
     next(err);
   }

@@ -6,6 +6,7 @@ const {
   getArticleId,
   patchArticleId,
   getUsers,
+  getArticles,
 } = require("./db/controllers/controllers");
 
 app.get("/api/topics", getTopics);
@@ -16,8 +17,9 @@ app.patch("/api/articles/:article_id", patchArticleId);
 
 app.get("/api/users", getUsers);
 
+app.get("/api/articles", getArticles);
+
 app.use((err, req, res, next) => {
-  // console.log(err, "<--error");
   if (err.status === 404) {
     res.status(404).send({ msg: "not found" });
   } else {
