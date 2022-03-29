@@ -24,8 +24,8 @@ xdescribe("GET /api/topics", () => {
   });
 });
 
-describe("GET /api/articles/:article_id", () => {
-  xtest("GET respond with an array of articles based on id", () => {
+xdescribe("GET /api/articles/:article_id", () => {
+  test("GET respond with an array of articles based on id", () => {
     return request(app)
       .get("/api/articles/5")
       .expect(200)
@@ -49,5 +49,30 @@ describe("GET /api/articles/:article_id", () => {
       .then((res) => {
         expect(res.body.msg).toBe("not found");
       });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  xtest("responds with the updated article", async () => {
+    const res = await request(app)
+      .patch("/api/articles/2")
+      .send({ inc_votes: 5 })
+      .expect(202);
+    expect(res.body.article).toEqual({
+      article_id: expect.any(Number),
+      title: expect.any(String),
+      topic: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+      created_at: expect.any(String),
+      votes: 5,
+    });
+  });
+  test("responds with the updated article", async () => {
+    const res = await request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 5 })
+      .expect(404);
+    expect(res.body.msg).toBe("not found");
   });
 });
