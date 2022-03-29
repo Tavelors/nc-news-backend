@@ -42,7 +42,7 @@ xdescribe("GET /api/articles/:article_id", () => {
         });
       });
   });
-  test("gives 404 not found when id does not exist", () => {
+  test("responds with 404 not found when id does not exist", () => {
     return request(app)
       .get("/api/articles/1000")
       .expect(404)
@@ -68,11 +68,26 @@ describe("PATCH /api/articles/:article_id", () => {
       votes: 5,
     });
   });
-  test("responds with the updated article", async () => {
+  test("responds with a 404 status and msg of not found", async () => {
     const res = await request(app)
       .patch("/api/articles/9999")
       .send({ inc_votes: 5 })
       .expect(404);
     expect(res.body.msg).toBe("not found");
+  });
+});
+
+describe("GET /api/users", () => {
+  test("GET respond with an array of users", async () => {
+    const res = await request(app).get("/api/users").expect(200);
+    // console.log(res.body.user);
+    res.body.user.forEach(() => {
+      expect.objectContaining({
+        username: expect.any(String),
+        name: expect.any(String),
+        avatar_url: expect.any(String),
+      });
+    });
+    expect(res.body.user.length).toBe(4);
   });
 });

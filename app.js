@@ -5,6 +5,7 @@ const {
   getTopics,
   getArticleId,
   patchArticleId,
+  getUsers,
 } = require("./db/controllers/controllers");
 
 app.get("/api/topics", getTopics);
@@ -12,6 +13,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleId);
 
 app.patch("/api/articles/:article_id", patchArticleId);
+
+app.get("/api/users", getUsers);
 
 app.use((err, req, res, next) => {
   // console.log(err, "<--error");
