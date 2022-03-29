@@ -49,9 +49,19 @@ exports.locateArticles = async () => {
     `select * from comments where author = '${result.rows[0].author}';`
   );
   const newResult = await queryComments;
-  newResult.rows.forEach((rows) => {
+  result.rows.forEach((rows) => {
     rows["comment_count"] = newResult.rows.length;
   });
+  return result.rows;
+};
 
-  return newResult.rows;
+exports.locateArticleIdComments = async (article_id) => {
+  const query = db.query(
+    `SELECT * FROM comments WHERE article_id = ${article_id}`
+  );
+  const result = await query;
+  if (result.rows.length === 0) {
+    return Promise.reject({ msg: "not found", status: 404 });
+  }
+  return result.rows;
 };

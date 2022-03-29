@@ -7,6 +7,7 @@ const {
   patchArticleId,
   getUsers,
   getArticles,
+  getArticleIdComments,
 } = require("./db/controllers/controllers");
 
 app.get("/api/topics", getTopics);
@@ -18,6 +19,8 @@ app.patch("/api/articles/:article_id", patchArticleId);
 app.get("/api/users", getUsers);
 
 app.get("/api/articles", getArticles);
+
+app.get("/api/articles/:article_id/comments", getArticleIdComments);
 
 app.use((err, req, res, next) => {
   if (err.status === 404) {

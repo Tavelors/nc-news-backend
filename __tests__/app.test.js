@@ -92,8 +92,8 @@ describe("GET /api/articles", () => {
   test("GET respond with an array of articles with the comment_count", async () => {
     const res = await request(app).get("/api/articles").expect(200);
 
-    res.body.article.forEach(() => {
-      expect.objectContaining({
+    res.body.article.forEach((articles) => {
+      expect(articles).toEqual({
         article_id: expect.any(Number),
         title: expect.any(String),
         topic: expect.any(String),
@@ -104,5 +104,26 @@ describe("GET /api/articles", () => {
         comment_count: expect.any(Number),
       });
     });
+  });
+});
+
+describe("GET /api/articles/article_id/comments", () => {
+  test("GET respond with an array of article comments", async () => {
+    const res = await request(app).get("/api/articles/1/comments").expect(200);
+    expect(res.body.comments.length).toBe(11);
+    res.body.comments.forEach((comments) => {
+      expect(comments).toEqual({
+        comment_id: expect.any(Number),
+        body: expect.any(String),
+        votes: expect.any(Number),
+        author: expect.any(String),
+        article_id: 1,
+        created_at: expect.any(String),
+      });
+    });
+  });
+  test("responds with a 404 status and msg of not found", async () => {
+    const res = await request(app).get("/api/articles/999/comments");
+    expect(res.body.msg).toBe("not found");
   });
 });

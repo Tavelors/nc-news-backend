@@ -4,6 +4,7 @@ const {
   updateArticleId,
   locateUsers,
   locateArticles,
+  locateArticleIdComments,
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -47,6 +48,16 @@ exports.getArticles = async (req, res, next) => {
   try {
     const articles = await locateArticles();
     res.status(200).send({ article: articles });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getArticleIdComments = async (req, res, next) => {
+  try {
+    const { article_id } = req.params;
+    const articleComments = await locateArticleIdComments(article_id);
+    res.status(200).send({ comments: articleComments });
   } catch (err) {
     next(err);
   }
