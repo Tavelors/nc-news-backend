@@ -42,8 +42,38 @@ exports.locateUsers = async () => {
   return result.rows;
 };
 
-exports.locateArticles = async () => {
-  const query = db.query(`SELECT * FROM articles`);
+exports.locateArticles = async (order_by) => {
+  const articleColumns = [
+    "title",
+    "topic",
+    "author",
+    "body",
+    "created_at",
+    "votes",
+  ];
+  const articleQuerys = ["order", []];
+
+  let querys = `SELECT * FROM articles`;
+  let arrayForValue = [];
+  const keyCheckOrderBy = Object.keys(order_by);
+  Object.keys(order_by).forEach((value) => arrayForValue.push(order_by[value]));
+  const isEmpty = (order_by) => {
+    return Object.keys(order_by).length !== 0;
+  };
+  if (
+    !articleQuerys.includes(keyCheckOrderBy[0]) &&
+    keyCheckOrderBy.length !== 0
+  ) {
+    return Promise.reject({ status: 400, msg: "invalid request" });
+  }
+  if (!articleColumns.includes(keyCheckOrderBy[0])) {
+    if (isEmpty(order_by)) querys += ` ORDER BY ${order_by.order}`;
+  }
+  if (articleColumns.includes(keyCheckOrderBy[0])) {
+    querys += ` WHERE ${keyCheckOrderBy[0]} = '${arrayForValue[0]}'`;
+  }
+  querys += `;`;
+  const query = db.query(querys);
   const result = await query;
   const queryComments = db.query(
     `select * from comments where author = '${result.rows[0].author}';`
@@ -65,3 +95,12 @@ exports.locateArticleIdComments = async (article_id) => {
   }
   return result.rows;
 };
+
+// exports.addArticleIdComments = async (body) => {
+//   const query = db.query(
+//     `INSERT INTO comments (username, body) VALUES ($1, $2) RETURNING *;`,
+//     [body.username, body.body]
+//   );
+//   const result = await query;
+//   return result.rows[0];
+// };

@@ -8,6 +8,7 @@ const {
   getUsers,
   getArticles,
   getArticleIdComments,
+  postArticleIdComments,
 } = require("./db/controllers/controllers");
 
 app.get("/api/topics", getTopics);
@@ -21,6 +22,15 @@ app.get("/api/users", getUsers);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id/comments", getArticleIdComments);
+
+// app.post("/api/articles/:article_id/comments", postArticleIdComments);
+app.use((err, req, res, next) => {
+  if (err.status === 400) {
+    res.status(400).send({ msg: "invalid request" });
+  } else {
+    next(err);
+  }
+});
 
 app.use((err, req, res, next) => {
   if (err.status === 404) {

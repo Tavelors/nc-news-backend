@@ -5,6 +5,7 @@ const {
   locateUsers,
   locateArticles,
   locateArticleIdComments,
+  addArticleIdComments,
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -46,7 +47,7 @@ exports.getUsers = async (req, res, next) => {
 
 exports.getArticles = async (req, res, next) => {
   try {
-    const articles = await locateArticles();
+    const articles = await locateArticles(req.query);
     res.status(200).send({ article: articles });
   } catch (err) {
     next(err);
@@ -62,3 +63,12 @@ exports.getArticleIdComments = async (req, res, next) => {
     next(err);
   }
 };
+
+// exports.postArticleIdComments = async (req, res, next) => {
+//   try {
+//     const articleComment = await addArticleIdComments(req.body);
+//     res.status(201).send({ comment: articleComment });
+//   } catch (err) {
+//     next(err);
+//   }
+// };

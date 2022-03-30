@@ -123,7 +123,55 @@ describe("GET /api/articles/article_id/comments", () => {
     });
   });
   test("responds with a 404 status and msg of not found", async () => {
-    const res = await request(app).get("/api/articles/999/comments");
+    const res = await request(app)
+      .get("/api/articles/999/comments")
+      .expect(404);
     expect(res.body.msg).toBe("not found");
+  });
+});
+
+// describe("POST /api/articles/3/comments", () => {
+//   test("post a new comment under a username?", async () => {
+//     const input = {
+//       body: "this is a comment",
+//       votes: 0,
+//       username: "icellusedkars",
+//     };
+//     const res = await request(app)
+//       .post("/api/articles/1/comments")
+//       .send(input)
+//       .expect(201);
+//     expect(res.body.comment).toEqual({
+//       username: "Tavelor",
+//       body: "this is a comment",
+//     });
+//   });
+// });
+
+describe("GET /api/articles (queries)", () => {
+  test("GET respond with an array of articles sorted by descending order", async () => {
+    const res = await request(app)
+      .get("/api/articles?order=created_at")
+      .expect(200);
+    expect(res.body.article.length).toBe(12);
+    expect(res.body.article).toBeSortedBy("created_at");
+    res.body.article.forEach((articles) => {
+      expect(articles).toEqual({
+        article_id: expect.any(Number),
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        comment_count: expect.any(Number),
+      });
+    });
+  });
+  test("GET responds with an error when given an invalid sort query", async () => {
+    const res = await request(app)
+      .get("/api/articles?invalidcolumn=cats")
+      .expect(400);
+    expect(res.body.msg).toBe("invalid request");
   });
 });
