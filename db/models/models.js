@@ -96,11 +96,36 @@ exports.locateArticleIdComments = async (article_id) => {
   return result.rows;
 };
 
-// exports.addArticleIdComments = async (body) => {
-//   const query = db.query(
-//     `INSERT INTO comments (username, body) VALUES ($1, $2) RETURNING *;`,
-//     [body.username, body.body]
-//   );
-//   const result = await query;
-//   return result.rows[0];
-// };
+exports.addArticleIdComments = async (body, article_id) => {
+  const commentCheck = {
+    body: "body",
+    username: "username",
+  };
+  for (let prop in commentCheck) {
+    if (typeof body[prop] !== typeof commentCheck[prop]) {
+      return Promise.reject({ status: 400, msg: "invalid request" });
+    }
+  }
+  const query = db.query(
+    `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;`,
+    [body.username, body.body, article_id]
+  );
+  const result = await query;
+  return result.rows[0];
+};
+
+exports.removeCommentById = async (comment_id) => {
+  const query = db.query(
+    `DELETE FROM comments WHERE comment_id = ${comment_id};`
+  );
+  const result = await query;
+  return result.rows[0];
+};
+
+exports.locateCommentById = async (comment_id) => {
+  const query = db.query(
+    `SELECT * FROM comments WHERE comment_id = ${comment_id}`
+  );
+  const result = await query;
+  return result.rows;
+};

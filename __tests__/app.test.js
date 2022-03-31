@@ -3,6 +3,7 @@ const app = require("../app");
 const testdata = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
 const request = require("supertest");
+const endPoints = require("../endpoints.json");
 
 afterAll(() => {
   return db.end;
@@ -130,23 +131,36 @@ describe("GET /api/articles/article_id/comments", () => {
   });
 });
 
-// describe("POST /api/articles/3/comments", () => {
-//   test("post a new comment under a username?", async () => {
-//     const input = {
-//       body: "this is a comment",
-//       votes: 0,
-//       username: "icellusedkars",
-//     };
-//     const res = await request(app)
-//       .post("/api/articles/1/comments")
-//       .send(input)
-//       .expect(201);
-//     expect(res.body.comment).toEqual({
-//       username: "Tavelor",
-//       body: "this is a comment",
-//     });
-//   });
-// });
+describe("POST /api/articles/3/comments", () => {
+  test("post a new comment under a username?", async () => {
+    const requestBody = {
+      body: "this is a comment",
+      username: "icellusedkars",
+    };
+    const res = await request(app)
+      .post("/api/articles/1/comments")
+      .send(requestBody)
+      .expect(201);
+    expect(res.body.comment).toEqual({
+      author: "icellusedkars",
+      body: "this is a comment",
+      votes: 0,
+      article_id: 1,
+      created_at: expect.any(String),
+      comment_id: expect.any(Number),
+    });
+  });
+  test("POST return 400 when body doesnt contain all required keys", async () => {
+    const requestBody = {
+      body: "this is a comment",
+    };
+    const res = await request(app)
+      .post("/api/articles/1/comments")
+      .send(requestBody)
+      .expect(400);
+    expect(res.body.msg).toEqual("invalid request");
+  });
+});
 
 describe("GET /api/articles (queries)", () => {
   test("GET respond with an array of articles sorted by descending order", async () => {
@@ -173,5 +187,14 @@ describe("GET /api/articles (queries)", () => {
       .get("/api/articles?invalidcolumn=cats")
       .expect(400);
     expect(res.body.msg).toBe("invalid request");
+  });
+});
+
+describe("DELETE", () => {
+  test("204 delete the given comment id", async () => {
+    const res = await request(app).delete("/api/comments/5").expect(204);
+    expect(res.body.comment).toEqual();
+    const secondRes = await request(app).get("/api/comments/5").expect(200);
+    expect(secondRes.body.comment).toEqual([]);
   });
 });

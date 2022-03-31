@@ -6,6 +6,8 @@ const {
   locateArticles,
   locateArticleIdComments,
   addArticleIdComments,
+  removeCommentById,
+  locateCommentById,
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -64,11 +66,41 @@ exports.getArticleIdComments = async (req, res, next) => {
   }
 };
 
-// exports.postArticleIdComments = async (req, res, next) => {
-//   try {
-//     const articleComment = await addArticleIdComments(req.body);
-//     res.status(201).send({ comment: articleComment });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+exports.postArticleIdComments = async (req, res, next) => {
+  try {
+    const { article_id } = req.params;
+    const articleComment = await addArticleIdComments(req.body, article_id);
+    res.status(201).send({ comment: articleComment });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteCommentById = async (req, res, next) => {
+  try {
+    const { comment_id } = req.params;
+    const comment = await removeCommentById(comment_id);
+    res.status(204).send({ comment });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getCommentById = async (req, res, next) => {
+  try {
+    const { comment_id } = req.params;
+    const comment = await locateCommentById(comment_id);
+    res.status(200).send({ comment: comment });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getApi = async (req, res, next) => {
+  try {
+    const api = await locateApi();
+    res.status(200).send({ api: api });
+  } catch (err) {
+    next(err);
+  }
+};

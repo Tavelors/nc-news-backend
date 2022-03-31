@@ -9,6 +9,9 @@ const {
   getArticles,
   getArticleIdComments,
   postArticleIdComments,
+  deleteCommentById,
+  getCommentById,
+  getApi,
 } = require("./db/controllers/controllers");
 
 app.get("/api/topics", getTopics);
@@ -23,7 +26,14 @@ app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id/comments", getArticleIdComments);
 
-// app.post("/api/articles/:article_id/comments", postArticleIdComments);
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.get("/api/comments/:comment_id", getCommentById);
+
+app.post("/api/articles/:article_id/comments", postArticleIdComments);
+
+app.get("/api", getApi);
+
 app.use((err, req, res, next) => {
   if (err.status === 400) {
     res.status(400).send({ msg: "invalid request" });
