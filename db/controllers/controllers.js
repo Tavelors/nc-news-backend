@@ -9,6 +9,8 @@ const {
   removeCommentById,
   locateCommentById,
 } = require("../models/models");
+const fs = require("fs/promises");
+const endPoint = require("../../endpoints.json");
 
 exports.getTopics = (req, res, next) => {
   locateTopics(req.params)
@@ -41,16 +43,19 @@ exports.patchArticleId = async (req, res, next) => {
 exports.getUsers = async (req, res, next) => {
   try {
     const users = await locateUsers();
-    res.status(200).send({ user: users });
+    res.status(200).send({ users: users });
   } catch (err) {
     next(err);
   }
 };
-
+////////////////////////////////////////////
 exports.getArticles = async (req, res, next) => {
   try {
-    const articles = await locateArticles(req.query);
-    res.status(200).send({ article: articles });
+    const { sort_by } = req.query;
+    const { order } = req.query;
+    const { topic } = req.query;
+    const articles = await locateArticles(sort_by, order, topic);
+    res.status(200).send({ articles: articles });
   } catch (err) {
     next(err);
   }
@@ -98,8 +103,8 @@ exports.getCommentById = async (req, res, next) => {
 
 exports.getApi = async (req, res, next) => {
   try {
-    const api = await locateApi();
-    res.status(200).send({ api: api });
+    console.log(endPoint);
+    res.status(200).send(endPoint);
   } catch (err) {
     next(err);
   }

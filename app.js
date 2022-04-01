@@ -51,8 +51,13 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send({ msg: "500" });
+  const errorCodes = ["22P02", "42703", "23503", "42601"];
+  if (errorCodes.includes(err.code)) {
+    res.status(400).send({ msg: "bad request" });
+  } else {
+    console.log(err);
+    res.status(500).send({ msg: "500" });
+  }
 });
 
 module.exports = app;

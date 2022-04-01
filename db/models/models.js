@@ -1,4 +1,6 @@
 const db = require("../connection");
+const fs = require("fs/promises");
+const format = require("pg-format");
 
 exports.locateTopics = (stuff) => {
   return db.query("SELECT * from topics;").then((results) => {
@@ -11,18 +13,20 @@ exports.locateArticleId = async (article_Id) => {
     `SELECT * FROM articles WHERE article_id = ${article_Id};`
   );
   const result = await queryArticles;
-
   if (result.rows.length === 0) {
     return Promise.reject({ status: 404, msg: "not found" });
   }
 
-  const queryComments = db.query(
-    `select * from comments where author = '${result.rows[0].author}';`
+  //   const formatQuery = format(
+  //     `select * from %I where %I = $1;`,
+  //     "comments",
+  //     "author"
+  //   );
+  //   const newResult = await db.query(formatQuery, [result.rows[0].author]);
+  const newResult = await db.query(
+    `SELECT * FROM comments WHERE author = '${result.rows[0].author}';`
   );
-  const newResult = await queryComments;
-
   result.rows[0]["comment_count"] = newResult.rows.length;
-
   return result.rows[0];
 };
 
@@ -42,8 +46,12 @@ exports.locateUsers = async () => {
   return result.rows;
 };
 
-exports.locateArticles = async (order_by) => {
-  const articleColumns = [
+exports.locateArticles = async (
+  sort_by = "created_at",
+  order = "DESC",
+  topic
+) => {
+  const validColumns = [
     "title",
     "topic",
     "author",
@@ -51,37 +59,24 @@ exports.locateArticles = async (order_by) => {
     "created_at",
     "votes",
   ];
-  const articleQuerys = ["order", []];
-
-  let querys = `SELECT * FROM articles`;
-  let arrayForValue = [];
-  const keyCheckOrderBy = Object.keys(order_by);
-  Object.keys(order_by).forEach((value) => arrayForValue.push(order_by[value]));
-  const isEmpty = (order_by) => {
-    return Object.keys(order_by).length !== 0;
-  };
-  if (
-    !articleQuerys.includes(keyCheckOrderBy[0]) &&
-    keyCheckOrderBy.length !== 0
-  ) {
+  if (!validColumns.includes(sort_by))
     return Promise.reject({ status: 400, msg: "invalid request" });
-  }
-  if (!articleColumns.includes(keyCheckOrderBy[0])) {
-    if (isEmpty(order_by)) querys += ` ORDER BY ${order_by.order}`;
-  }
-  if (articleColumns.includes(keyCheckOrderBy[0])) {
-    querys += ` WHERE ${keyCheckOrderBy[0]} = '${arrayForValue[0]}'`;
-  }
-  querys += `;`;
-  const query = db.query(querys);
-  const result = await query;
+  let query = `SELECT * FROM articles`;
+  if (topic) query += ` WHERE topic = '${topic}'`;
+  if (sort_by) query += ` ORDER BY ${sort_by} ${order}`;
+  query += ";";
+  const querys = db.query(query);
+  const result = await querys;
+  if (result.rows.length === 0)
+    return Promise.reject({ status: 400, msg: "invalid request" });
   const queryComments = db.query(
-    `select * from comments where author = '${result.rows[0].author}';`
+    `SELECT * FROM comments WHERE author = '${result.rows[0].author}';`
   );
   const newResult = await queryComments;
-  result.rows.forEach((rows) => {
-    rows["comment_count"] = newResult.rows.length;
-  });
+  result.rows.forEach(
+    (rows) => (rows["comment_count"] = newResult.rows.length)
+  );
+  console.log(result.rows);
   return result.rows;
 };
 
@@ -119,6 +114,9 @@ exports.removeCommentById = async (comment_id) => {
     `DELETE FROM comments WHERE comment_id = ${comment_id};`
   );
   const result = await query;
+  if (result.rowCount === 0) {
+    return Promise.reject({ status: 404, msg: "not found" });
+  }
   return result.rows[0];
 };
 
@@ -130,4 +128,12 @@ exports.locateCommentById = async (comment_id) => {
   return result.rows;
 };
 
-//changes
+// exports.locateApi = async () => {
+//   return fs.readfile(`../endpoints.json`, "utf8", (err, file) => {
+//     if (err) console.log(err);
+//     else {
+//       const parsedFile = JSON.parse(file);
+//       return parsedFile;
+//     }
+//   });
+// };

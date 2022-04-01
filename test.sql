@@ -10,4 +10,5 @@
 -- INSERT INTO comments
 -- (username, )
 SELECT * from articles
-WHERE topic = 'cats';
+where topic = 'cats'
+order by topic desc;
