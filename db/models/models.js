@@ -76,7 +76,6 @@ exports.locateArticles = async (
   result.rows.forEach(
     (rows) => (rows["comment_count"] = newResult.rows.length)
   );
-  console.log(result.rows);
   return result.rows;
 };
 
@@ -127,13 +126,3 @@ exports.locateCommentById = async (comment_id) => {
   const result = await query;
   return result.rows;
 };
-
-// exports.locateApi = async () => {
-//   return fs.readfile(`../endpoints.json`, "utf8", (err, file) => {
-//     if (err) console.log(err);
-//     else {
-//       const parsedFile = JSON.parse(file);
-//       return parsedFile;
-//     }
-//   });
-// };

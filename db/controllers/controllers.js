@@ -103,7 +103,6 @@ exports.getCommentById = async (req, res, next) => {
 
 exports.getApi = async (req, res, next) => {
   try {
-    console.log(endPoint);
     res.status(200).send(endPoint);
   } catch (err) {
     next(err);
