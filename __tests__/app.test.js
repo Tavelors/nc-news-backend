@@ -24,7 +24,7 @@ xdescribe("GET /api/topics", () => {
   });
 });
 
-describe("GET /api/articles/:article_id (comment count)", () => {
+xdescribe("GET /api/articles/:article_id (comment count)", () => {
   test("GET respond with an array of articles based on id", async () => {
     const res = await request(app).get("/api/articles/1").expect(200);
 
@@ -244,14 +244,14 @@ xdescribe("DELETE", () => {
   });
 });
 
-describe("GET /api", () => {
+xdescribe("GET /api", () => {
   test("respond with the api", async () => {
     const res = await request(app).get("/api").expect(200);
     expect(res.body).toEqual(endPoints);
   });
 });
 
-describe("GET /api/articles (queries)", () => {
+xdescribe("GET /api/articles (queries)", () => {
   test("GET respond with an array of articles sorted by descending order", async () => {
     const res = await request(app)
       .get("/api/articles?sort_by=title")
