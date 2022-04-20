@@ -56,6 +56,7 @@ exports.locateArticles = async (
     "topic",
     "author",
     "body",
+    "comment_count",
     "created_at",
     "votes",
   ];
