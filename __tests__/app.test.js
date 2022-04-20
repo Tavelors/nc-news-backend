@@ -251,13 +251,13 @@ xdescribe("GET /api", () => {
   });
 });
 
-xdescribe("GET /api/articles (queries)", () => {
+describe("GET /api/articles (queries)", () => {
   test("GET respond with an array of articles sorted by descending order", async () => {
     const res = await request(app)
       .get("/api/articles?sort_by=title")
       .expect(200);
     expect(res.body.articles.length).toBe(12);
-    expect(res.body.articles).toBeSorted("title");
+    expect(res.body.articles).toBeSortedBy("title", { descending: true });
     res.body.articles.forEach((articles) => {
       expect(articles).toEqual({
         article_id: expect.any(Number),
@@ -272,9 +272,9 @@ xdescribe("GET /api/articles (queries)", () => {
     });
   });
   test("GET responds with the default column in ascending order", async () => {
-    const res = await request(app).get("/api/articles?order=asc").expect(200);
+    const res = await request(app).get("/api/articles?order=ASC").expect(200);
     expect(res.body.articles.length).toBe(12);
-    expect(res.body.articles).toBeSorted("created_by");
+    expect(res.body.articles).toBeSortedBy("created_at");
   });
   test("GET responds with the articles topic value", async () => {
     const res = await request(app).get("/api/articles?topic=cats").expect(200);

@@ -57,6 +57,7 @@ exports.getArticles = async (req, res, next) => {
     const articles = await locateArticles(sort_by, order, topic);
     res.status(200).send({ articles: articles });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

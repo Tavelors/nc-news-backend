@@ -62,21 +62,22 @@ exports.locateArticles = async (
   ];
   if (!validColumns.includes(sort_by))
     return Promise.reject({ status: 400, msg: "invalid request" });
-  let query = `SELECT * FROM articles`;
+  let query = `SELECT articles.*, COUNT(comments.article_id)::int AS comment_count FROM articles
+  LEFT JOIN comments ON articles.article_id = comments.article_id`;
   if (topic) query += ` WHERE topic = '${topic}'`;
+  query += " GROUP BY articles.article_id";
   if (sort_by) query += ` ORDER BY ${sort_by} ${order}`;
-  query += ";";
   const querys = db.query(query);
   const result = await querys;
   if (result.rows.length === 0)
     return Promise.reject({ status: 400, msg: "invalid request" });
-  const queryComments = db.query(
-    `SELECT * FROM comments WHERE author = '${result.rows[0].author}';`
-  );
-  const newResult = await queryComments;
-  result.rows.forEach(
-    (rows) => (rows["comment_count"] = newResult.rows.length)
-  );
+  // const queryComments = db.query(
+  //   `SELECT * FROM comments WHERE author = '${result.rows[0].author}';`
+  // );
+  // const newResult = await queryComments;
+  // result.rows.forEach(
+  //   (rows) => (rows["comment_count"] = newResult.rows.length)
+  // );
   return result.rows;
 };
 
