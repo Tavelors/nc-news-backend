@@ -1,3 +1,14 @@
 \c nc_news_test;
 
-select * from articles WHERE article_id = 2;
+-- select * from articles;
+-- select * from comments;
+-- select * 
+-- from comments
+-- where author = 'icellusedkars';
+-- SELECT * from comments WHERE article_id = 1;
+-- SELECT * from comments;
+-- INSERT INTO comments
+-- (username, )
+SELECT * from articles
+where topic = 'cats'
+order by topic desc;
